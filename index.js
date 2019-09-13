@@ -23,17 +23,18 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     agent.add(`I'm sorry, can you try again?`);
   }
   
-  function BTCpriceHandler(agent){
-  	getBTCprice().then(function(result){
+  function priceHandler(agent) {
+  	return getBTCprice().then(function(result){
     	agent.add("The current price of bitcoin is " + result + " USD");
+
     }).catch(function(fromReject){
         console.log(fromReject);
 	});
   }
   
-  // Fulfill BTC price query business logic
+  // A helper function that fetches the price of BTC
   function getBTCprice() {
-	return new Promise((resolve, reject) => {
+	  return new Promise((resolve, reject) => {
     
 	  // Check the price, then return response after getting the price
       https.get('https://blockchain.info/q/24hrprice', (res) => {
@@ -46,7 +47,6 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
       
         // The whole response has been received. Print out the result.
         res.on('end', () => {
-          //console.log(JSON.parse(data).explanation);
           resolve(JSON.parse(data));
         });
         
@@ -59,8 +59,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   intentMap.set('Portfolio Welcome Intent', welcome);
   intentMap.set('Default Fallback Intent', fallback);
   // intentMap.set('your intent name here', yourFunctionHandler);
-  intentMap.set('BTC Price Query Intent', BTCpriceHandler);
+  intentMap.set('BTC Price Query Intent', priceHandler);
   agent.handleRequest(intentMap);
-  
   
 });
